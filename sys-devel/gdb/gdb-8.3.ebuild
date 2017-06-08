@@ -3,8 +3,9 @@
 
 EAPI=7
 PYTHON_COMPAT=( python{3_6,3_7} )
+PLOCALES="da de es fi fr ga id it ja nl pt_BR ro ru rw sv tr uk vi zh_CN"
 
-inherit eutils flag-o-matic python-single-r1
+inherit l10n eutils flag-o-matic python-single-r1
 
 export CTARGET=${CTARGET:-${CHOST}}
 if [[ ${CTARGET} == ${CHOST} ]] ; then
@@ -235,6 +236,13 @@ src_install() {
 	if [[ ${CHOST} == *-freebsd* ]]; then
 		rm "${ED}"/usr/bin/gcore || die
 	fi
+
+# Remove disabled locales
+	# build fails if we remove all languages in src_prepare
+	rm_loc() {
+		rm -r "${ED}/usr/share/locale/${1}" || die
+	}
+	l10n_for_each_disabled_locale_do rm_loc
 }
 
 pkg_postinst() {
